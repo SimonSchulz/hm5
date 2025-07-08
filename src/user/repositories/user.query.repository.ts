@@ -18,7 +18,7 @@ export const usersQueryRepository = {
 
     const filter: any = {};
     if (searchLoginTerm && searchEmailTerm) {
-      filter.$and = [
+      filter.$or = [
         { login: { $regex: searchLoginTerm, $options: "i" } },
         { email: { $regex: searchEmailTerm, $options: "i" } },
       ];
