@@ -8,42 +8,15 @@ import { passwordValidation } from "../validation/password.validation";
 import { loginValidation } from "../validation/login.validation";
 import { emailValidation } from "../validation/email.validation";
 import { inputValidationResultMiddleware } from "../../core/utils/input-validtion-result.middleware";
-import { PaginatedOutput } from "../../core/types/paginated.output";
-import { UserQueryInput } from "../types/user-query.input";
-import { setSortAndPagination } from "../../core/helpers/set-sort-and-pagination";
 import { InputUserDto } from "../dto/user.input-dto";
-import { PaginationAndSorting } from "../../core/types/pagination-and-sorting";
-import { UserSortField } from "../types/UserSortFields";
 import {
   NotFoundError,
   ValidationError,
 } from "../../core/utils/app-response-errors";
+import { getUsersHandler } from "./handlers/get-users.handler";
 
 export const usersRouter = Router({});
-usersRouter.get(
-  "/",
-  authMiddleware,
-  async (
-    req: Request<{}, {}, UserQueryInput>,
-    res: Response<PaginatedOutput>,
-  ) => {
-    const {
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-    }: PaginationAndSorting<UserSortField> = setSortAndPagination(req.query);
-
-    const allUsers = await usersQueryRepository.findAllUsers({
-      pageNumber,
-      pageSize,
-      sortBy,
-      sortDirection,
-    });
-    if (!allUsers) throw new ValidationError();
-    res.status(HttpStatus.Ok).send(allUsers);
-  },
-);
+usersRouter.get("/", authMiddleware, getUsersHandler);
 
 usersRouter.post(
   "/",
