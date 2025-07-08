@@ -14,7 +14,10 @@ import { setSortAndPagination } from "../../core/helpers/set-sort-and-pagination
 import { InputUserDto } from "../dto/user.input-dto";
 import { PaginationAndSorting } from "../../core/types/pagination-and-sorting";
 import { UserSortField } from "../types/UserSortFields";
-import { ValidationError } from "../../core/utils/app-response-errors";
+import {
+  NotFoundError,
+  ValidationError,
+} from "../../core/utils/app-response-errors";
 
 export const usersRouter = Router({});
 usersRouter.get(
@@ -66,9 +69,7 @@ usersRouter.delete(
   async (req: Request, res: Response) => {
     const id = req.params.id;
     const user = await usersService.delete(id);
-
-    if (!user) throw new ValidationError("Invalid user id");
-
+    if (!user) throw new NotFoundError("User does not exist");
     res.sendStatus(HttpStatus.NoContent);
   },
 );
