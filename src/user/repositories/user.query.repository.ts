@@ -20,7 +20,7 @@ export const usersQueryRepository = {
     if (searchLoginTerm) {
       filter.login = { $regex: searchLoginTerm, $options: "i" };
     }
-    if (searchLoginTerm) {
+    if (searchEmailTerm) {
       filter.email = { $regex: searchEmailTerm, $options: "i" };
     }
 
