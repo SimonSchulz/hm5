@@ -18,15 +18,20 @@ export const usersQueryRepository = {
 
     const filter: any = {};
 
+    const escapeRegex = (input: string) =>
+      input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+
     if (searchLoginTerm && searchEmailTerm) {
+      const escapedEmailTerm = escapeRegex(searchEmailTerm);
       filter.$and = [
         { login: { $regex: searchLoginTerm, $options: "i" } },
-        { email: { $regex: searchEmailTerm, $options: "i" } },
+        { email: { $regex: escapedEmailTerm, $options: "i" } }, // просто вхождение
       ];
     } else if (searchLoginTerm) {
       filter.login = { $regex: searchLoginTerm, $options: "i" };
     } else if (searchEmailTerm) {
-      filter.email = { $regex: searchEmailTerm, $options: "i" };
+      const escapedEmailTerm = escapeRegex(searchEmailTerm);
+      filter.email = { $regex: escapedEmailTerm, $options: "i" };
     }
 
     const totalCount = await userCollection.countDocuments(filter);
