@@ -17,21 +17,15 @@ export const usersQueryRepository = {
     } = sortQueryDto;
 
     const filter: any = {};
-
-    const escapeRegex = (input: string) =>
-      input.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-
     if (searchLoginTerm && searchEmailTerm) {
-      const escapedEmailTerm = escapeRegex(searchEmailTerm);
       filter.$and = [
         { login: { $regex: searchLoginTerm, $options: "i" } },
-        { email: { $regex: escapedEmailTerm, $options: "i" } }, // просто вхождение
+        { email: { $regex: searchEmailTerm, $options: "i" } },
       ];
     } else if (searchLoginTerm) {
       filter.login = { $regex: searchLoginTerm, $options: "i" };
     } else if (searchEmailTerm) {
-      const escapedEmailTerm = escapeRegex(searchEmailTerm);
-      filter.email = { $regex: escapedEmailTerm, $options: "i" };
+      filter.email = { $regex: searchEmailTerm, $options: "i" };
     }
 
     const totalCount = await userCollection.countDocuments(filter);
