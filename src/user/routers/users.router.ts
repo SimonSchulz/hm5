@@ -14,6 +14,7 @@ import { setSortAndPagination } from "../../core/helpers/set-sort-and-pagination
 import { InputUserDto } from "../dto/user.input-dto";
 import { PaginationAndSorting } from "../../core/types/pagination-and-sorting";
 import { UserSortField } from "../types/UserSortFields";
+import { ValidationError } from "../../core/utils/app-response-errors";
 
 export const usersRouter = Router({});
 usersRouter.get(
@@ -36,7 +37,7 @@ usersRouter.get(
       sortBy,
       sortDirection,
     });
-
+    if (!allUsers) throw new ValidationError();
     res.status(HttpStatus.Ok).send(allUsers);
   },
 );
@@ -50,10 +51,11 @@ usersRouter.post(
   inputValidationResultMiddleware,
   async (req: Request<{}, {}, InputUserDto>, res: Response<UserViewModel>) => {
     const { login, password, email } = req.body;
-
     const userId = await usersService.create({ login, password, email });
     const newUser = await usersQueryRepository.findById(userId);
-
+    if (!newUser) {
+      throw new ValidationError("Invalid user data");
+    }
     res.status(HttpStatus.Created).send(newUser!);
   },
 );
@@ -65,7 +67,7 @@ usersRouter.delete(
     const id = req.params.id;
     const user = await usersService.delete(id);
 
-    if (!user) res.sendStatus(HttpStatus.NotFound);
+    if (!user) throw new ValidationError("Invalid user id");
 
     res.sendStatus(HttpStatus.NoContent);
   },

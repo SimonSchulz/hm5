@@ -1,6 +1,6 @@
-export interface User {
+export type User = {
   login: string;
   email: string;
   passwordHash: string;
   createdAt: string;
-}
+};
