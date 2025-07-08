@@ -16,14 +16,25 @@ export const usersQueryRepository = {
       searchEmailTerm,
     } = sortQueryDto;
 
-    const filter = {
-      ...(searchLoginTerm && {
+    const filterConditions = [];
+
+    if (searchLoginTerm) {
+      filterConditions.push({
         login: { $regex: searchLoginTerm, $options: "i" },
-      }),
-      ...(searchEmailTerm && {
+      });
+    }
+
+    if (searchEmailTerm) {
+      filterConditions.push({
         email: { $regex: searchEmailTerm, $options: "i" },
-      }),
-    };
+      });
+    }
+
+    const filter = filterConditions.length
+      ? filterConditions.length === 1
+        ? filterConditions[0]
+        : { $and: filterConditions }
+      : {};
 
     const totalCount = await userCollection.countDocuments(filter);
 
